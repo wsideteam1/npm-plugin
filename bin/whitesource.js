@@ -522,6 +522,7 @@ cli.main(function (args, options) {
     // 	process.stdout.write(version + '\n');
     // 	process.exit();
     // }
+
     if (cli.command === "run") {
         runtimeMode = "node";
         cli.ok('Running whitesource V' + version + '...');

@@ -541,7 +541,6 @@ cli.main(function (args, options) {
                 cli.fatal("'npm ls' command failed with the following output:\n" + error + "Make sure to run 'npm install' prior to running the plugin. Please resolve the issue and rerun the scan operation.");
             } else {
                 cli.ok('Done calculation dependencies!');
-
                 var lsResult = fs.readFileSync(pathOfNpmLsFile, 'utf8');
                 var lsJsonResult = JSON.parse(fs.readFileSync(pathOfNpmLsJsonFile, 'utf8'));
                 WsNodeReportBuilder.traverseLsJson(lsJsonResult, lsResult, registryAccessToken)

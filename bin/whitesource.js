@@ -4,7 +4,6 @@
 
 process.title = 'whitesource';
 
-var shell = require('shelljs/global');
 var cli = require('cli');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
@@ -522,6 +521,7 @@ cli.main(function (args, options) {
     // 	process.stdout.write(version + '\n');
     // 	process.exit();
     // }
+
     if (cli.command === "run") {
         runtimeMode = "node";
         cli.ok('Running whitesource V' + version + '...');

@@ -17,6 +17,7 @@ var prompt = require('prompt');
 prompt.message = "whitesource";
 prompt.delimiter = ">".green;
 
+
 var runtime = new Date().valueOf();
 
 var constants = require('./constants');

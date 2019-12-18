@@ -162,6 +162,30 @@ function getTheNextPackageNameFromNpmLs(currentLine) {
     }
 }
 
+
+function getParentDepPointer(depPointer) {
+    //Example :  "[dependencies"]["ft-next-express"]["dependencies"]["@financial-times"]["n-handlebars"]"
+
+    //["n-handlebars"]"
+    var childDepStr = depPointer.substr(depPointer.lastIndexOf('['), depPointer.lastIndexOf(']'));
+
+    //"n-handlebars"
+    var childDepName = JSON.parse(childDepStr)[0];
+
+    //"[dependencies"]["ft-next-express"]["dependencies"]["@financial-times"]"
+    var ansStr = depPointer.substr(0, depPointer.lastIndexOf('['));
+
+    //"[dependencies"]["ft-next-express"]["dependencies"]["@financial-times"
+    var transStr = ansStr.substring(0, ansStr.lastIndexOf('"]'));
+
+    //"[dependencies"]["ft-next-express"]["dependencies"]["@financial-times" + / + child + "]";
+    var fixedStr = transStr + "/" + childDepName + '"]';
+    return fixedStr;
+
+}
+
+
+
 WsNodeReportBuilder.traverseLsJson = function (npmLsJson, npmLs, registryAccessToken) {
     cli.ok("Building dependencies report");
     var invalidDeps = [];
@@ -179,27 +203,6 @@ WsNodeReportBuilder.traverseLsJson = function (npmLsJson, npmLs, registryAccessT
     // Create "endsWith" function for node version 0.10.x and earlier.
     String.prototype.endsWith = String.prototype.endsWith || function (str) {
         return new RegExp(str + "$").test(str);
-    };
-
-    var getParentDepPointer = function (depPointer) {
-        //Example :  "[dependencies"]["ft-next-express"]["dependencies"]["@financial-times"]["n-handlebars"]"
-
-        //["n-handlebars"]"
-        var childDepStr = depPointer.substr(depPointer.lastIndexOf('['), depPointer.lastIndexOf(']'));
-
-        //"n-handlebars"
-        var childDepName = JSON.parse(childDepStr)[0];
-
-        //"[dependencies"]["ft-next-express"]["dependencies"]["@financial-times"]"
-        var ansStr = depPointer.substr(0, depPointer.lastIndexOf('['));
-
-        //"[dependencies"]["ft-next-express"]["dependencies"]["@financial-times"
-        var transStr = ansStr.substring(0, ansStr.lastIndexOf('"]'));
-
-        //"[dependencies"]["ft-next-express"]["dependencies"]["@financial-times" + / + child + "]";
-        var fixedStr = transStr + "/" + childDepName + '"]';
-        return fixedStr;
-
     };
 
     var requestPromises = [];
@@ -243,19 +246,21 @@ WsNodeReportBuilder.traverseLsJson = function (npmLsJson, npmLs, registryAccessT
                 && !isName && !isNodeMod && !isFrom
                 && !isResolved && !isVer && !isShasum && isValidPath && !isMissing && !isRequired) {
 
-                //console.log('scanning for shasum at path: ' + fullUri )
-                var strArr = fullUri.split("");
-                for (var k = 0; k < strArr.length; k++) {
-                    if (strArr[k] == SLASH) {
-                        strArr[k] = '"]["';
-                    }
-                }
-
                 var dataObjPointer;
-                var joinedStr = strArr.join('');
+                var joinedStr = fullUri.split(SLASH).join('"]["');
                 joinedStr = joinedStr.substr(0, joinedStr.lastIndexOf('['));
                 var objPointer = 'parseData["' + joinedStr.replace(/node_modules/gi, "dependencies");
                 objPointer = replaceScopedDependencies(objPointer);
+
+                let detectedBadPath = false;
+                invalidDeps.forEach( badPath => {
+                    if (objPointer.startsWith(badPath)) {
+                        detectedBadPath = true;
+                    }
+                });
+                if (detectedBadPath) {
+                    continue;
+                }
 
                 var invalidProj = false;
                 try {
@@ -270,8 +275,6 @@ WsNodeReportBuilder.traverseLsJson = function (npmLsJson, npmLs, registryAccessT
                     uri = getPackageJsonPath(uri, excludes);
                     if (uri === packageJsonText || !uri.endsWith(packageJsonText)) {
                         invalidProj = true;
-                        // badPackage = true;
-
                     }
 
                     var packageJson = JSON.parse(fs.readFileSync(uri, 'utf8'));
@@ -296,12 +299,24 @@ WsNodeReportBuilder.traverseLsJson = function (npmLsJson, npmLs, registryAccessT
                             invalidProj = false;
                         } else {
                             var pointerString = objPointer.substring('parseData'.length);
-                            if (!eval(objPointer)) {
+                            let evalResult = undefined;
+                            try {
+                                evalResult = eval(objPointer);
+                            } catch (e) {
+                                // console.log("evalResult: " + objPointer);
+                            }
+                            if (!evalResult) {
                                 var parentDepPointer = getParentDepPointer(pointerString);
                                 invalidDeps.push(parentDepPointer);
                                 objPointer = 'parseData' + parentDepPointer;
                             }
-                            var parentDep = eval('delete ' + objPointer);
+                            try {
+                                // console.log("deleting: " + objPointer);
+                                eval('delete ' + objPointer);
+                                invalidDeps.push(objPointer);
+                            } catch (e) {
+                                // console.log("failed to delete: " + objPointer);
+                            }
                             packageJson.name = path[path.length - 1];
                         }
                     }

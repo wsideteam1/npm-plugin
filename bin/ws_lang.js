@@ -8,10 +8,10 @@ WsLang.dictionary = function(){
 		running:"Running whitesource...",
 		doneCalcDep:"Done calculating dependencies!",
 		readingDeps:"Reading dependencies report"
-	}
+	};
 	return obj;
-}
+};
 
 WsLang.text = function(key){
 	return WsLang.dictionary()[key];
-}
+};

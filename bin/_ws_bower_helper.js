@@ -35,7 +35,7 @@ WsBowerHelper.checksumBowerDeps = function(files){
 			var sumClc = (typeof (sum) != "undefined") ? sum : "0";
 			console.log(this.newLoc + "  sum: " + sumClc);
 			WsBowerHelper.writeSha1File(this.newLoc,sumClc);
-		}
+		};
 
 		// console.log('checksum now for ' + newLoc + "/" + compMainFile);
 		checksum.file(newLoc + "/" + compMainFile, callback.bind({newLoc:newLoc}));
@@ -43,14 +43,14 @@ WsBowerHelper.checksumBowerDeps = function(files){
 		// 	console.log('wtf?')
 		// });
 	}
-}
+};
 
 
 WsBowerHelper.generateCompsSha1 = function(){
 	var bowerDir = WsBowerReportBuilder.getBowerCompsDir();
 	var files = glob.sync( bowerDir + "/**/.bower.json", {});
 	WsBowerHelper.checksumBowerDeps(files);
-}
+};
 
 WsBowerHelper.writeSha1File = function(location,sum){
 	try{
@@ -59,4 +59,4 @@ WsBowerHelper.writeSha1File = function(location,sum){
 	}catch(e){
 		cli.error(e);
 	}
-}
+};

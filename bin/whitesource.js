@@ -89,7 +89,7 @@ var buildCallback = function (isSuc, resJsonString, exitCode) {
         } else {
             if (isFailOnError && isPolicyViolation) {
                 cli.error("Some dependencies were rejected by the organization's policies");
-                cli.error("Build failed!")
+                cli.error("Build failed!");
                 exitWithCodeMessage(statusCode.POLICY_VIOLATION);
             }
 
@@ -431,7 +431,8 @@ var deleteNpmLsAndFolderIfNotDebugMode = function () {
         fs.unlink("./ws-" + constants.NPM_LS, unlinkCallback);
         fs.rmdir(constants.LOG_FILES_FOLDER, function (err) { });
     }
-    function unlinkCallback(err) { };
+    function unlinkCallback(err) {
+    }
 };
 
 var getNpmLsJsonPath = function () {
@@ -500,7 +501,7 @@ cli.main(function (args, options) {
         isIgnoreNpmLsErros = confJson.ignoreNpmLsErrors === true || confJson.ignoreNpmLsErrors === "true";
     }
     cli.ok('Config file is located in: ' + confPath);
-    var devDepMsg = 'If you have installed Dev Dependencies and like to include them in the WhiteSource report,\n add devDep flag to the whitesource.config file to continue.'
+    var devDepMsg = 'If you have installed Dev Dependencies and like to include them in the WhiteSource report,\n add devDep flag to the whitesource.config file to continue.';
     var missingPackageJsonMsg = 'Missing Package.json file. \n whitesource requires a valid package.json file to proceed';
     var missingYarnLockMsg = 'Missing yarn.lock file. \n whitesource requires a valid yarn.lock file to proceed';
 
@@ -598,7 +599,7 @@ cli.main(function (args, options) {
         }
         cli.ok('Done calculation dependencies!');
         var children = WsNodeReportBuilder.traverseYarnData(yarnData);
-        var json = {children: children, name: confJson.productName, version: confJson.productVer}
+        var json = {children: children, name: confJson.productName, version: confJson.productVer};
 
         deleteNpmLsAndFolderIfNotDebugMode();
         if (isDebugMode) {

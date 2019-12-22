@@ -47,7 +47,7 @@ WsNodeReportBuilder.refitNodes = function (obj) {
                 value[i].name = i;
                 value[i].groupId = i;
                 value[i].systemPath = null;
-                value[i].scope = null;;
+                value[i].scope = null;
                 value[i].exclusions = [];
                 value[i].classifier = null;
             }
@@ -535,7 +535,7 @@ WsNodeReportBuilder.traverseYarnData = function(yarnDependencies){
                 url = url.substr(0, url.length - urlParts[1].length - 1);
             }
         }
-        let output = {}
+        let output = {};
         output["shasum"] = shasum;
         output["url"] = url;
         return output;
@@ -557,7 +557,7 @@ WsNodeReportBuilder.traverseYarnData = function(yarnDependencies){
 
     printFoundShasumData(foundedShasum, missingShasum);
     return allChildren;
-}
+};
 
 
 function finalizeDependencies(parseData, npmLs){

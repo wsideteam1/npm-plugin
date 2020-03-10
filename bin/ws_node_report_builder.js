@@ -213,7 +213,7 @@ WsNodeReportBuilder.traverseLsJson = function (npmLsJson, npmLs, registryAccessT
 
         // There is a section called "problems", it includes the missing packages list
         // We want to ignore this section
-        if(path.indexOf("problems") > -1 ) {
+        if(path.indexOf("problems") > -1 )  {
 			continue;
 		}
         var isRequired = false;
@@ -561,7 +561,7 @@ WsNodeReportBuilder.traverseYarnData = function(yarnDependencies){
 
 
 function finalizeDependencies(parseData, npmLs){
-    removeMissingDependencies(parseData);
+    removeMissingDependencies(parseData.dependencies);
     let dependenciesWithDuplicates = WsNodeReportBuilder.refitNodes(parseData);
     var dependenciesWithoutDuplicates = { name: dependenciesWithDuplicates.name, version: dependenciesWithDuplicates.version, children: [] };
     var foundedAndMissing = {
@@ -574,11 +574,13 @@ function finalizeDependencies(parseData, npmLs){
     return dependenciesWithoutDuplicates;
 }
 
-function removeMissingDependencies(parseData) {
-    var dependencies = parseData.dependencies;
+function removeMissingDependencies(dependencies) {
     for (var dependency in dependencies){
         if (dependencies[dependency].version == undefined){
             delete dependencies[dependency];
+        }
+        else if (dependencies[dependency].dependencies != undefined) {
+            removeMissingDependencies(dependencies[dependency].dependencies);
         }
     }
 }

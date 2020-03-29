@@ -39,6 +39,8 @@
   ],
   "devDependencies": {},
   "dependencies": {
+    "kind-of": "6.0.3",
+    "minimist": "1.2.2",
     "@yarnpkg/lockfile": "^1.1.0",
     "bluebird": "^3.5.2",
     "checksum": "0.1.1",
